@@ -2,6 +2,14 @@
 <html lang="en">
 <head>
     <title>{% block title %}parker demo{% endblock %}</title>
+    {% block script_setup %}
+    <script src="socket.io.js"> </script>
+    <script src="jquery-1.6.4.js" > </script>
+    <script src="mustache.js" > </script>
+    <script src="marimo.js" > </script>
+    <script src="realtime.js" > </script>
+    <script language="javascript">marimo.init($);</script>
+    {% endblock %}
 </head>
 
 <body>

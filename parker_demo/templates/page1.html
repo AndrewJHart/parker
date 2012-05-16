@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to the Parker Demo</h1>
+<p> as you save content it should appear below </p>
+<div id="parkertest1"></div>
+<script language="javascript">
+    marimo.add_wsiget({
+      widget_prototype: 'browsermq',
+      id: "parkertest1",
+      template: '<h3>{{title}}</h3><p>{{summary}}<br/><a href="{{url}}">{{url}}</a></p>',
+      socket_path: 'http://mordechai.cei.cox.com:8008',
+      queues: ['test.queue1']
+    });
+</script>
+{% endblock %}

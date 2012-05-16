@@ -1,10 +1,11 @@
 from django.conf.urls import patterns, include, url
-
+from django.views.generic.simple import direct_to_template
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^page1/$', direct_to_template, {'template': 'page1.html'}),
     # Examples:
     # url(r'^$', 'parker_demo.views.home', name='home'),
     # url(r'^parker_demo/', include('parker_demo.foo.urls')),
