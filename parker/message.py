@@ -1,13 +1,12 @@
 """ this is a temporary place to hold the code needed to send messaged """
 from kombu import Connection, Exchange
 
-from django.core.conf import settings
 
 #TODO don't hard code these
 QUEUE_URL = "amqp://guest:guest@localhost:5672//"
 exchange = Exchange('browsermq_global', type='topic')
 
-def send_message(route, message):
+def publish(route, message):
     """ simply send a messate to a route.
 
     :param route: a route in the browsermq format right now just a routing_key
