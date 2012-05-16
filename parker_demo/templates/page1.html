@@ -5,11 +5,11 @@
 <p> as you save content it should appear below </p>
 <div id="parkertest1"></div>
 <script language="javascript">
-    marimo.add_wsiget({
+    marimo.add_widget({
       widget_prototype: 'browsermq',
       id: "parkertest1",
       template: '<h3>{{title}}</h3><p>{{summary}}<br/><a href="{{url}}">{{url}}</a></p>',
-      socket_path: 'http://mordechai.cei.cox.com:8008',
+      socket_path: 'mordechai.cei.cox.com:8008',
       queues: ['test.queue1']
     });
 </script>
