@@ -8,6 +8,9 @@ class ParkerDemo(models.Model):
     summary = models.TextField(max_length=1000)
     link = models.CharField(max_length=1000)
 
+    def __str__(self):
+        return self.title
+
 # this is going here for now. The whole point of parker
 # is to not have to write this type of code. But first
 # it's useful to see what it would like if you had to write it
