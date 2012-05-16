@@ -5,7 +5,8 @@ from django.views.generic.simple import direct_to_template
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^page1/$', direct_to_template, {'template': 'page1.html'}),
+    url(r'^page1/$', direct_to_template, {'template': 'page1.html',
+        'extra_context':{'mtemplate':'<h3>{{title}}</h3><p>{{summary}}<br/><a href="{{url}}">{{url}}</a></p>'}}),
     # Examples:
     # url(r'^$', 'parker_demo.views.home', name='home'),
     # url(r'^parker_demo/', include('parker_demo.foo.urls')),
