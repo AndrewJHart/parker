@@ -2,3 +2,4 @@
 *.swp
 parker_demo/local_db
 *.egg-info
+.tox
