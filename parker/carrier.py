@@ -17,12 +17,12 @@ marimo.add_widget({
 """
 
 
-class BasePusher(object):
+class BaseCarrier(object):
 
-    #: the default template for this pusher's widgets
+    #: the default template for this carrier's widgets
     default_template = None
 
-    #: the queues this pusher's widgets should list on. TODO connect these with the events
+    #: the queues this carrier's widgets should list on. TODO connect these with the events
     queues = []
 
     #: the socket path that the widgets should listen on
@@ -33,7 +33,7 @@ class BasePusher(object):
 
     # The following code may not belong here
     def collect_events(self):
-        """ return all event instances associates with this pusher """
+        """ return all event instances associates with this carrier """
         return getmembers(self, lambda x: isinstance(x, BaseEvent))
 
     def setup_events(self):
@@ -50,12 +50,10 @@ class BasePusher(object):
         return ParkerLoader().get_template_source(template or self.default_template)
 
     def get_widget(self, widget_id, prototype=None, template=None, queues=None):
-        """ once the templatetag finds this pusher this is all it should have call """
+        """ once the templatetag finds this carrier this is all it should have call """
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
                        template = self.get_template(template),
                        queues = queues or self.queues,
                        )
         return WIDGET_CODE.format(context)
-
-

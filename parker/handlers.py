@@ -1,5 +1,5 @@
 """ for now handlers will handle everything.
-    much of this needs to come from the pusher itself.
+    much of this needs to come from the carrier itself.
 """
 from parker.message import publish
 
