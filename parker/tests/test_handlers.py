@@ -19,7 +19,8 @@ class TestModelHandler(object):
             field.name = f
             sender._meta.fields.append(field)
         handler = ModelHandler('testqueue')
-        assert fields == handler.get_message(sender)
+        # in this case the model instance is the same as the model
+        assert fields == handler.get_message(sender, sender)
         fields.pop('z')
         handler= ModelHandler('testqueue', ['x','y'])
-        assert fields == handler.get_message(sender)
+        assert fields == handler.get_message(sender, sender)

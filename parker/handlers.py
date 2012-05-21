@@ -6,7 +6,8 @@ from parker.message import publish
 
 class Handler(object):
     def __call__(self, **kwargs):
-        publish(self.get_queues(**kwargs), self.get_message(**kwargs))
+        for q in self.get_queues(**kwargs):
+            publish(q, self.get_message(**kwargs))
 
     def get_queues(self, **kwargs):
         """ this determines what queues a message goes too """
@@ -25,6 +26,6 @@ class ModelHandler(Handler):
     def get_queues(self, **kwargs):
         return self.queues
 
-    def get_message(self, sender, **kwargs):
-        fields = self.fields or [x.name for x in sender._meta.fields]
-        return  dict([[field, getattr(sender, field)] for field in fields])
+    def get_message(self, sender, instance, **kwargs):
+        fields = self.fields or [x.name for x in instance._meta.fields]
+        return  dict([[field, getattr(instance, field)] for field in fields])
