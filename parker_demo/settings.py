@@ -108,11 +108,11 @@ ROOT_URLCONF = 'parker_demo.urls'
 WSGI_APPLICATION = 'parker_demo.wsgi.application'
 
 TEMPLATE_DIRS = (
-        os.path.join(PROJECT_ROOT, 'templates')
+        os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 PARKER_TEMPLATE_DIRS = (
-        os.path.join(PROJECT_ROOT, 'mustache_templates')
+        os.path.join(PROJECT_ROOT, 'mustache_templates'),
 )
 
 PARKER_CARRIERS = ['parker_demo.demo.carriers.DemoCarrier',]

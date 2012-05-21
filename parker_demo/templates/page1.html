@@ -13,4 +13,6 @@
       queues: ['test.queue1']
     });
 </script>
+{% load parker_tags %}
+{% parker "parker_demo.demo.carriers.DemoCarrier" "parkertest2" %}
 {% endblock %}

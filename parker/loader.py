@@ -11,7 +11,7 @@ class ParkerLoader(object):
     """ this is basically just the filesystem loader from django except it can't compile
     """
     is_usable = True
-    def __init__():
+    def __init__(self):
         pass
 
     def load_template_source(self, template_name, template_dirs=None):

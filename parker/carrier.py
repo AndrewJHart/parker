@@ -1,17 +1,20 @@
 from inspect import getmembers
 
+from django.template import Template, Context
+
 from parker.events import BaseEvent
 from parker.loader import ParkerLoader
 
 #TODO: move this to a template
-WIDGET_CODE = """ <div id={widget_id}></div>
+#TODO: making this a django template may have been a poor decision
+WIDGET_CODE = """ <div id={{ widget_id }}></div>
 <script>
 marimo.add_widget({
-  widget_prototype: '{prototype}',
-  id: '{widget_id}',
-  template: '{template}',
-  socket_path: '{socket}',
-  queues: '{queues}'
+  widget_prototype: '{{ prototype }}',
+  id: '{{ widget_id }}',
+  template: '{{ template|safe }}',
+  socket_path: '{{ socket }}',
+  queues: {{ queues|safe }}
 });
 </script>
 """
@@ -50,7 +53,8 @@ class BaseCarrier(object):
 
     def get_template(self, template=None):
         """ just enough to work on the template tag """
-        return ParkerLoader().get_template_source(template or self.default_template)
+        #TODO what should we do about multiline templates here
+        return ParkerLoader().load_template_source(template or self.default_template)[0].replace('\n','')
 
     def get_widget(self, widget_id, prototype=None, template=None, queues=None):
         """ once the templatetag finds this carrier this is all it should have call """
@@ -58,5 +62,7 @@ class BaseCarrier(object):
                        prototype=prototype or self.default_prototype,
                        template = self.get_template(template),
                        queues = queues or self.queues,
+                       socket = self.socket
                        )
-        return WIDGET_CODE.format(context)
+        template = Template(WIDGET_CODE)
+        return template.render(Context(context))
