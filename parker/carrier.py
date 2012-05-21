@@ -31,17 +31,20 @@ class BaseCarrier(object):
     #: the default prototype for this widget
     default_prototype = 'browsermq'
 
+    def __init__(self):
+        self.setup_event()
+
     # The following code may not belong here
     def collect_events(self):
         """ return all event instances associates with this carrier """
-        return getmembers(self, lambda x: isinstance(x, BaseEvent))
+        return [x[1] for x in getmembers(self, lambda x: isinstance(x, BaseEvent))]
 
     def setup_events(self):
         """ this really seems wrong 
             Do whatever the events think they need to get connected
             I'm also not sure how to get the queus if they're not static
         """
-        for event in self.collect_events:
+        for event in self.collect_events():
             event.connect()
 
 

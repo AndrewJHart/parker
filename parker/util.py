@@ -12,3 +12,9 @@ def smartimport(mpath):
         for p in parts[1:]:
             mod = getattr(mod, p)
     return mod
+
+
+def load_carrier(carrier_name):
+    """ this works for now but should probably be changes """
+    CClass = smartimport(carrier_name)
+    return CClass()
