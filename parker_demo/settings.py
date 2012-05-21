@@ -111,6 +111,12 @@ TEMPLATE_DIRS = (
         os.path.join(PROJECT_ROOT, 'templates')
 )
 
+PARKER_TEMPLATE_DIRS = (
+        os.path.join(PROJECT_ROOT, 'mustache_templates')
+)
+
+PARKER_CARRIERS = ['parker_demo.demo.carriers.DemoCarrier',]
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -123,6 +129,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'parker_demo.demo',
+    #this needs to be at the bottom until we stop setting it up in models
+    'parker',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -32,7 +32,7 @@ class BaseCarrier(object):
     default_prototype = 'browsermq'
 
     def __init__(self):
-        self.setup_event()
+        self.setup_events()
 
     # The following code may not belong here
     def collect_events(self):
