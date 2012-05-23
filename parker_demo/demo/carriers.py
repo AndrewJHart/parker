@@ -2,6 +2,9 @@ from parker.carrier import BaseCarrier
 from parker.events import SignalEvent
 from parker.handlers import ModelHandler
 
+from parker.library import parker_lib
+
+@parker_lib.register
 class DemoCarrier(BaseCarrier):
     name = 'DemoCarrier'
     default_template = 'demo.html'
