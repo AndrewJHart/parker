@@ -20,6 +20,18 @@ class SignalEvent(BaseEvent):
         self.handler = handler
         self.sender = sender
 
+
+    @property
+    def signal_string(self):
+        """ TODO we need a better way of identifying signals  """
+        signal = self.signal
+        if not isinstance(signal, basestring):
+            signal = '.'.join(signal.__module__, signal.__name__)
+        sender = self.sender
+        if not (sender is None or isinstance(sender, basestring)):
+            sender = '.'.join(sender.__module__, sender.__name__)
+        return '-'.join(signal, sender)
+
     def connect(self):
         if isinstance(self.signal, basestring):
             self.signal = smartimport(self.signal)
