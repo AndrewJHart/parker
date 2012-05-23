@@ -5,13 +5,15 @@ from parker.message import publish
 
 
 class Handler(object):
+    default_queue = None
+
     def __call__(self, **kwargs):
         for q in self.get_queues(**kwargs):
             publish(q, self.get_message(**kwargs))
 
     def get_queues(self, **kwargs):
         """ this determines what queues a message goes too """
-        raise NotImplemented
+        return self.default_queue
 
     def get_message(self, **kwargs):
         """ this determines the object that will be seriealized into the message """

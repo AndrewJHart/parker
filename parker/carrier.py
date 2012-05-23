@@ -25,8 +25,14 @@ class BaseCarrier(object):
     #: the default template for this carrier's widgets
     default_template = None
 
-    #: the queues this carrier's widgets should list on. TODO connect these with the events
-    queues = []
+    #: for now each carrier will publish to it's own exchange
+    exchange = None
+
+    #: the default exchange type is topic exchange
+    exchange_type = 'topic'
+
+    #: this only works for topic exchanges. otherwise consider changing it
+    default_queue = '#'
 
     #: the socket path that the widgets should listen on
     socket = None
@@ -48,8 +54,10 @@ class BaseCarrier(object):
             I'm also not sure how to get the queus if they're not static
         """
         for event in self.collect_events():
+            # this is an awful hack to get the default_queue in place
+            if not event.handler.default_queue:
+                event.handler.default_queue = self.default_queue
             event.connect()
-
 
     def get_template(self, template=None):
         """ just enough to work on the template tag """
@@ -61,7 +69,7 @@ class BaseCarrier(object):
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
                        template = self.get_template(template),
-                       queues = queues or self.queues,
+                       queues = queues or [self.default_queue],
                        socket = self.socket
                        )
         template = Template(WIDGET_CODE)
