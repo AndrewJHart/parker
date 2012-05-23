@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from parker.library import parker_lib
-from parker.util import load_carrier
+from parker.util import smartimport
 
 for carrier in settings.PARKER_CARRIERS:
-    parker_lib[carrier] = load_carrier(carrier)
+    parker_lib.register(smartimport(carrier))
