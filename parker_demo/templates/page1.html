@@ -3,16 +3,6 @@
 {% block content %}
 <h1>Welcome to the Parker Demo</h1>
 <p> as you save content it should appear below </p>
-<div id="parkertest1"></div>
-<script language="javascript">
-    marimo.add_widget({
-      widget_prototype: 'browsermq',
-      id: "parkertest1",
-      template: '{{ mtemplate|safe }}',
-      socket_path: 'mordechai.cei.cox.com:8000',
-      queues: ['test.queue1']
-    });
-</script>
 {% load parker_tags %}
-{% parker "parker_demo.demo.carriers.DemoCarrier" "parkertest2" %}
+{% parker "DemoCarrier" "parkertest2" %}
 {% endblock %}

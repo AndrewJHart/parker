@@ -3,6 +3,7 @@ from parker.events import SignalEvent
 from parker.handlers import ModelHandler
 
 class DemoCarrier(BaseCarrier):
+    name = 'DemoCarrier'
     default_template = 'demo.html'
     queues = ['test.queue1']
     socket = 'mordechai.cei.cox.com:8000'

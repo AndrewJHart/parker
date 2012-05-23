@@ -13,4 +13,4 @@ class ParkerLibrary(object):
         return self.carriers[key]
 
 # TODO move this a rename it
-library = ParkerLibrary()
+parker_lib = ParkerLibrary()
