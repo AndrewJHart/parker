@@ -1,6 +1,6 @@
 import django
 if django.VERSION < (1, 4, 0):
-    from simpletag.base_template import Library
+    from simple_tag.base_template import Library
 else:
     from django.template import Library
 
