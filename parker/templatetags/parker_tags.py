@@ -1,8 +1,13 @@
-from django import template
+import django
+if django.VERSION < (1, 4, 0):
+    from simpletag.base_template import Library
+else:
+    from django.template import Library
+
 
 from parker.library import parker_lib
 
-register = template.Library()
+register = Library()
 
 @register.simple_tag(name='parker')
 def parker_tag(carrier, widget_id, prototype=None, template=None, queues=None):
