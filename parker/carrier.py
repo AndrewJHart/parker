@@ -1,6 +1,7 @@
 from inspect import getmembers
 import pystache
 from django.template import Template, Context
+from django.template.defaultfilters import escapejs
 
 from parker.events import BaseEvent
 from parker.loader import ParkerLoader
@@ -12,7 +13,7 @@ WIDGET_CODE = """ <div id={{ widget_id }}>{{ inital_state }}</div>
 marimo.add_widget({
   widget_prototype: '{{ prototype }}',
   id: '{{ widget_id }}',
-  template: '{{ template|escapejs }}',
+  template: '{{ template|safe }}',
   socket_path: '{{ socket }}',
   queues: {{ queues|safe }}
 });
@@ -69,7 +70,7 @@ class BaseCarrier(object):
         mustache_template = self.get_template(template)
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
-                       template = mustache_template,
+                       template = escapejs(mustache_template),
                        queues = queues or [self.default_queue],
                        socket = self.socket
                        )
