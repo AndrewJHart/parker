@@ -4,6 +4,8 @@ from django.conf import settings
 from parker.library import parker_lib
 from parker.util import smartimport
 
+
+
 if getattr(settings, 'PARKER_AUTODISCOVER', True):
     for app in settings.INSTALLED_APPS:
         try:

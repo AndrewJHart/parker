@@ -8,7 +8,7 @@ from parker.loader import ParkerLoader
 
 #TODO: move this to a template
 #TODO: making this a django template may have been a poor decision
-WIDGET_CODE = """ <div id={{ widget_id }}>{{ inital_state }}</div>
+WIDGET_CODE = """ <div id={{ widget_id }}>{{ initial_state|safe}}</div>
 <script>
 marimo.add_widget({
   widget_prototype: '{{ prototype }}',
@@ -74,8 +74,10 @@ class BaseCarrier(object):
                        queues = queues or [self.default_queue],
                        socket = self.socket
                        )
-        if initialize:
-            context['initial_state'] = pystache.render(mustache_template, self.get_context(**kwargs))
+        if True: #initialize:
+            initial_context = self.get_context(**kwargs)
+            if initial_context:
+                context['initial_state'] = pystache.render(mustache_template, self.get_context(**kwargs))
         template = Template(WIDGET_CODE)
         return template.render(Context(context))
 
