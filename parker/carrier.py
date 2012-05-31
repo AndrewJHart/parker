@@ -1,5 +1,5 @@
 from inspect import getmembers
-
+import pystache
 from django.template import Template, Context
 
 from parker.events import BaseEvent
@@ -7,12 +7,12 @@ from parker.loader import ParkerLoader
 
 #TODO: move this to a template
 #TODO: making this a django template may have been a poor decision
-WIDGET_CODE = """ <div id={{ widget_id }}></div>
+WIDGET_CODE = """ <div id={{ widget_id }}>{{ inital_state }}</div>
 <script>
 marimo.add_widget({
   widget_prototype: '{{ prototype }}',
   id: '{{ widget_id }}',
-  template: '{{ template|safe }}',
+  template: '{{ template|escapejs }}',
   socket_path: '{{ socket }}',
   queues: {{ queues|safe }}
 });
@@ -62,15 +62,22 @@ class BaseCarrier(object):
     def get_template(self, template=None):
         """ just enough to work on the template tag """
         #TODO what should we do about multiline templates here
-        return ParkerLoader().load_template_source(template or self.default_template)[0].replace('\n','')
+        return ParkerLoader().load_template_source(template or self.default_template)[0]
 
-    def get_widget(self, widget_id, prototype=None, template=None, queues=None):
+    def get_widget(self, widget_id, prototype=None, template=None, queues=None, initialize=False, **kwargs):
         """ once the templatetag finds this carrier this is all it should have call """
+        mustache_template = self.get_template(template)
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
-                       template = self.get_template(template),
+                       template = mustache_template,
                        queues = queues or [self.default_queue],
                        socket = self.socket
                        )
+        if initialize:
+            context['initial_state'] = pystache.render(mustache_template, self.get_context(**kwargs))
         template = Template(WIDGET_CODE)
         return template.render(Context(context))
+
+    def get_context(self, **kwargs):
+        """if you want to prepopulate a widget this should generate the context"""
+        raise NotImplemented
