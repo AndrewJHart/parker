@@ -22,10 +22,12 @@ class ModelSignalCarrier(object):
         return self.default_queues
 
 
-class Listener(object):
-    def __init__(self, signal, model):
+class ModelListener(object):
+    def __init__(self, signal, model, get_message=None):
         self._signal = signal
         self._model = model
+        if get_message:
+            self.get_message = get_message
 
     @property
     def signal(self):
