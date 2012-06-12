@@ -57,6 +57,3 @@ class TastyPieHandler(Handler):
         # TODO: should we even support this? it seems likely to be request specific
         bundle = resource.alter_detail_data_to_serialize(req, bundle)
         return resource.serialize(req, bundle, 'application/json')
-
-
-

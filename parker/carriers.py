@@ -23,7 +23,7 @@ class ModelSignalCarrier(object):
 
 
 class ModelListener(object):
-    def __init__(self, signal, model, get_message=None):
+    def __init__(self, model, signal='django.db.models.signals.post_save', get_message=None):
         self._signal = signal
         self._model = model
         if get_message:
@@ -46,3 +46,17 @@ class ModelListener(object):
 
     def get_message(self, *args, **kwargs):
         raise NotImplemented
+
+class TastyPieListener(ModelListener):
+    def __init__(self, resource, signal='django.db.models.signals.post_save'):
+        self._resource = resource
+
+    @property
+    def resource(self):
+        """ this really needs to be dried out """
+        pass
+
+
+    def get_message(self, *args, **kwargs):
+        """ from tastypie handler """
+        pass

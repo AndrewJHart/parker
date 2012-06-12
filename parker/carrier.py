@@ -5,6 +5,7 @@ from django.template.defaultfilters import escapejs
 
 from parker.events import BaseEvent
 from parker.loader import ParkerLoader
+from parker.message import publish
 
 #TODO: move this to a template
 #TODO: making this a django template may have been a poor decision
@@ -41,8 +42,26 @@ class BaseCarrier(object):
     #: the default prototype for this widget
     default_prototype = 'browsermq'
 
+    #: does this widget initialize by default
+    initialize = False
+
     def __init__(self):
         self.setup_events()
+
+    def publish(self, message, queue):
+        publish(q, message)
+
+    def get_publish_queues(self, *args, **kwargs):
+        """ based on the arguments given to a signal what queues should it publish too
+            default is the default_queues
+        """
+        return self.default_queues
+
+    def get_subscribe_queues(self, *args, **kwargs):
+        """ based on the arguments given to the template tag what queues should this listen on
+            default is the default_queues
+        """
+        return self.default_queues
 
     # The following code may not belong here
     def collect_events(self):
@@ -55,9 +74,6 @@ class BaseCarrier(object):
             I'm also not sure how to get the queus if they're not static
         """
         for event in self.collect_events():
-            # this is an awful hack to get the default_queue in place
-            if not event.handler.default_queue:
-                event.handler.default_queue = self.default_queue
             event.connect()
 
     def get_template(self, template=None):
@@ -65,22 +81,24 @@ class BaseCarrier(object):
         #TODO what should we do about multiline templates here
         return ParkerLoader().load_template_source(template or self.default_template)[0]
 
-    def get_widget(self, widget_id, prototype=None, template=None, queues=None, initialize=False, **kwargs):
+    def get_widget(self, widget_id, prototype=None, template=None, queues=None, initialize=None, **kwargs):
         """ once the templatetag finds this carrier this is all it should have call """
         mustache_template = self.get_template(template)
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
                        template = escapejs(mustache_template),
-                       queues = queues or [self.default_queue],
+                       queues = queues or self.subscribe_queues(**kwargs),
                        socket = self.socket
                        )
-        if True: #initialize:
+        if initialize is None:
+            initialize = self.initialize
+        if initialize:
             initial_context = self.get_context(**kwargs)
             if initial_context:
-                context['initial_state'] = pystache.render(mustache_template, self.get_context(**kwargs))
+                context['initial_state'] = pystache.render(mustache_template, self.get_context(context['queues'],**kwargs))
         template = Template(WIDGET_CODE)
         return template.render(Context(context))
 
-    def get_context(self, **kwargs):
+    def get_context(self, queues, **kwargs):
         """if you want to prepopulate a widget this should generate the context"""
-        raise NotImplemented
+        for queue in 
