@@ -1,4 +1,4 @@
-from parker.events import BaseEvent, SignalEvent
+from parker.events import BaseEvent, SignalEvent, ModelListener
 
 from mock import patch, Mock
 
@@ -24,3 +24,19 @@ class TestSignalEvent(object):
         event.connect()
         assert mimport.called
         assert msignal.connect.called
+
+class TestModelListener(object):
+    def test_connect(self):
+        model = Mock()
+        signal = Mock()
+        get_message= Mock()
+        ml = ModelListener(model, signal, get_message)
+        publish = Mock()
+        ml.connect(publish)
+        assert not publish.called
+        assert not get_message.called
+        assert signal.connect.called
+        handler = signal.connect.call_args[0][0]
+        handler()
+        assert publish.called
+        assert get_message.called

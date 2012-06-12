@@ -1,5 +1,6 @@
 """ the events are used to connect """
-from parker.util import smartimport
+from django.http import HttpRequest
+from parker.util import smartimport, LazyDescriptor
 
 
 class BaseEvent(object):
@@ -44,3 +45,62 @@ class SignalEvent(BaseEvent):
             self.signal.connect(self.handler, self.sender)
         else:
             self.signal.connect(self.handler)
+
+
+class ModelListener(object):
+
+    signal = LazyDescriptor('signal')
+    model = LazyDescriptor('model')
+
+
+    def __init__(self, model, signal='django.db.models.signals.post_save', get_message=None):
+        self.signal = signal
+        self.model = model
+        if get_message:
+            self.get_message = get_message
+
+    def get_message(self, *args, **kwargs):
+        """ this can be overriden or passed into __init__ for now """
+        raise NotImplemented
+
+    def connect(self, publish):
+        def handler(*args, **kwargs):
+            message = self.get_message(*args, **kwargs)
+            return publish(message, *args, **kwargs)
+
+        self.signal.connect(handler, sender=self.model)
+
+class TastyPieListener(ModelListener):
+    resource = LazyDescriptor("resource")
+
+    @property
+    def model(self):
+        return self.resource._meta.queryset.model
+
+    def __init__(self, resource, signal="django.db.models.signals.post_save", process_message=None):
+        self.resource = resource
+        self.signal = signal
+
+
+    def process_message(self, message, sender, instance, **kwargs):
+        return message
+
+    def get_message(self, sender, instance, **kwargs):
+        """ unfortunately the design of tastypie makes it hard to use it to just serialize objects
+            if you do much with the request in your resource this will break
+        """
+        if isinstance(self.resource, basestring):
+            self.resource = smartimport(self.resource)
+        resource = self.resource()
+        # is this the least disruptive way to to this?
+        def get_obj(**kwargs):
+            return instance
+        self.resource.get_obj = get_obj
+        # if anything tries to use this it will likely fail
+        req = HttpRequest()
+        bundle = resource.build_bundle(obj=instance)
+        bundle = resource.full_dehydrate(bundle)
+        # TODO: should we even support this? it seems likely to be request specific
+        bundle = resource.alter_detail_data_to_serialize(req, bundle)
+        message = resource.serialize(req, bundle, 'application/json')
+        return self.process_message(message, sender, instance, **kwargs)
