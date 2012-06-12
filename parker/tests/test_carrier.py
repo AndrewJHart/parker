@@ -39,13 +39,13 @@ class TestGetWidget(TestCase):
 
     class TestCarrier(BaseCarrier):
         default_prototype = "defproto"
-        default_queue = "defqueue"
+        default_queues = ["defqueue"]
         socket = 'sock'
 
         def get_template(self, template=None):
             return "{{test}}"
 
-        def get_context(self, **kwargs):
+        def get_context(self, queues, **kwargs):
             return dict(test="test1")
 
     def test_defaults(self):

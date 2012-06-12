@@ -34,7 +34,7 @@ class BaseCarrier(object):
     exchange_type = 'topic'
 
     #: this only works for topic exchanges. otherwise consider changing it
-    default_queue = '#'
+    default_queues = ['#']
 
     #: the socket path that the widgets should listen on
     socket = None
@@ -87,18 +87,18 @@ class BaseCarrier(object):
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,
                        template = escapejs(mustache_template),
-                       queues = queues or self.subscribe_queues(**kwargs),
+                       queues = queues or self.get_subscribe_queues(**kwargs),
                        socket = self.socket
                        )
         if initialize is None:
             initialize = self.initialize
         if initialize:
-            initial_context = self.get_context(**kwargs)
+            initial_context = self.get_context(context['queues'], **kwargs)
             if initial_context:
-                context['initial_state'] = pystache.render(mustache_template, self.get_context(context['queues'],**kwargs))
+                context['initial_state'] = pystache.render(mustache_template, initial_context)
         template = Template(WIDGET_CODE)
         return template.render(Context(context))
 
     def get_context(self, queues, **kwargs):
         """if you want to prepopulate a widget this should generate the context"""
-        for queue in 
+        pass
