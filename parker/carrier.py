@@ -48,7 +48,7 @@ class BaseCarrier(object):
     def __init__(self):
         self.setup_events()
 
-    def publish(self, message, queue):
+    def publish(self, message, q):
         publish(q, message)
 
     def get_publish_queues(self, *args, **kwargs):

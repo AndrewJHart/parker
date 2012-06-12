@@ -41,6 +41,11 @@ class TestBaseCarrier(TestCase):
     def test_get_subscribe_queues(self):
         self.assertEqual(self.carrier.get_subscribe_queues(), ['queue1','queue2'])
 
+    @patch('parker.carrier.publish')
+    def test_publish(self, pub):
+        self.carrier.publish("message", "q")
+        self.assertTrue(pub.called)
+
 
 class TestGetWidget(TestCase):
 
