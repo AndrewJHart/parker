@@ -1,6 +1,9 @@
-from parker.util import smartimport
+from unittest2 import TestCase
+from parker.util import smartimport, LazyDescriptor
 
-class TestSmartImport(object):
+from mock import patch, call
+
+class TestSmartImport(TestCase):
     def test_imports_package(self):
         """ smart import will import a package """
         importable = smartimport('parker.tests.importable')
@@ -18,3 +21,31 @@ class TestSmartImport(object):
         bar = smartimport('parker.tests.importable.foo.bar')
         import parker.tests.importable
         assert bar == parker.tests.importable.foo.bar
+
+
+class TestLazyDescriptor(TestCase):
+    def test_attr_error(self):
+        class Test(object):
+            attr = LazyDescriptor("attr")
+        with self.assertRaises(AttributeError):
+           Test().attr
+
+    def test_default(self):
+        class Test(object):
+            attr = LazyDescriptor("attr", 10)
+        self.assertEqual(Test().attr, 10)
+
+    def test_set(self):
+        class Test(object):
+            attr = LazyDescriptor("attr")
+        t = Test()
+        t.attr = 14
+        self.assertEqual(t.attr, 14)
+
+    @patch("parker.util.smartimport")
+    def test_imports(self, mocksi):
+        class Test(object):
+            attr = LazyDescriptor("attr", "path")
+
+        Test().attr
+        self.assertEqual(mocksi.call_args, call("path"))
