@@ -6,7 +6,8 @@ class BaseEvent(object):
     """ for now this just exists to check if an object is an event. 
        code may be moved up here later
     """
-    pass
+    def connect(self, publish):
+        pass
 
 class SignalEvent(BaseEvent):
     """ this event is a django signal I assume this is going to be the main

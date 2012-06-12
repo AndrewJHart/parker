@@ -48,9 +48,6 @@ class BaseCarrier(object):
     def __init__(self):
         self.setup_events()
 
-    def publish(self, message, q):
-        publish(q, message)
-
     def get_publish_queues(self, *args, **kwargs):
         """ based on the arguments given to a signal what queues should it publish too
             default is the default_queues
@@ -74,7 +71,13 @@ class BaseCarrier(object):
             I'm also not sure how to get the queus if they're not static
         """
         for event in self.collect_events():
-            event.connect()
+            event.connect(self.publish)
+
+    def publish(self, message, *args, **kwargs):
+        for queue in self.get_publish_queues(*args, **kwargs):
+            publish(message, queue)
+
+
 
     def get_template(self, template=None):
         """ just enough to work on the template tag """

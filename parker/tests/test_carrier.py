@@ -1,13 +1,15 @@
 from parker.carrier import BaseCarrier
+from parker.events import BaseEvent
 
 from unittest2 import TestCase
 
-from mock import patch, Mock
+from mock import patch, Mock, call
 
 class TestBaseCarrier(TestCase):
     def setUp(self):
         class TestCarrier(BaseCarrier):
             default_queues = ['queue1','queue2']
+
         self.TestCarrier = TestCarrier
         self.carrier = TestCarrier()
 
@@ -16,6 +18,8 @@ class TestBaseCarrier(TestCase):
         class TestEvent(object):
             handler = Mock()
             connect = mock_conn
+            def connect(self, publish):
+                pass
 
         event_instance1 = TestEvent()
         event_instance2 = TestEvent()
@@ -31,8 +35,6 @@ class TestBaseCarrier(TestCase):
             carrier = TestCarrier()
             self.assertTrue(event_instance1 in carrier.collect_events())
             self.assertTrue(event_instance2 in carrier.collect_events())
-            carrier.setup_events()
-            self.assertEqual(mock_conn.call_count, 2)
 
 
     def test_get_publish_queues(self):
@@ -44,7 +46,17 @@ class TestBaseCarrier(TestCase):
     @patch('parker.carrier.publish')
     def test_publish(self, pub):
         self.carrier.publish("message", "q")
-        self.assertTrue(pub.called)
+        self.assertEqual(pub.call_count, 2)
+
+
+    @patch('parker.carrier.BaseEvent')
+    def test_setup_events(self, BE):
+        event1 = Mock()
+        event2 = Mock()
+        self.carrier.collect_events = lambda : [event1, event2]
+        self.carrier.setup_events()
+        self.assertEqual(event1.connect.call_args, call(self.carrier.publish))
+        self.assertEqual(event2.connect.call_args, call(self.carrier.publish))
 
 
 class TestGetWidget(TestCase):
