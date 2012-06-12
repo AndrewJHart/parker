@@ -7,8 +7,9 @@ from mock import patch, Mock
 class TestBaseCarrier(TestCase):
     def setUp(self):
         class TestCarrier(BaseCarrier):
-            pass
+            default_queues = ['queue1','queue2']
         self.TestCarrier = TestCarrier
+        self.carrier = TestCarrier()
 
     def test_collect_events(self):
         mock_conn = Mock()
@@ -33,6 +34,12 @@ class TestBaseCarrier(TestCase):
             carrier.setup_events()
             self.assertEqual(mock_conn.call_count, 2)
 
+
+    def test_get_publish_queues(self):
+        self.assertEqual(self.carrier.get_publish_queues(), ['queue1','queue2'])
+
+    def test_get_subscribe_queues(self):
+        self.assertEqual(self.carrier.get_subscribe_queues(), ['queue1','queue2'])
 
 
 class TestGetWidget(TestCase):
