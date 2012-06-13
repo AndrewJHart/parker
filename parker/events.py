@@ -47,13 +47,22 @@ class SignalEvent(BaseEvent):
             self.signal.connect(self.handler)
 
 
-class ModelListener(object):
+class ModelListener(BaseEvent):
+    """ this  is a listener for model signals it defaults to post_save
+        it either needs to have get_message overrrided or one can be passed in when it's created
+    """
 
     signal = LazyDescriptor('signal')
     model = LazyDescriptor('model')
 
 
     def __init__(self, model, signal='django.db.models.signals.post_save', get_message=None):
+        """
+            :param model: the model or a string that this should listen to
+            :param signal: the signal or a string to be imported later that this should connect to
+            :get_message: a function to connect to signal... soon to be replaced
+
+        """
         self.signal = signal
         self.model = model
         if get_message:
@@ -64,6 +73,7 @@ class ModelListener(object):
         raise NotImplemented
 
     def connect(self, publish):
+        """ passing the publish message down seems backwards but maybe it isn't """
         def handler(*args, **kwargs):
             message = self.get_message(*args, **kwargs)
             return publish(message, *args, **kwargs)
@@ -77,7 +87,7 @@ class TastyPieListener(ModelListener):
     def model(self):
         return self.resource._meta.queryset.model
 
-    def __init__(self, resource, signal="django.db.models.signals.post_save", process_message=None):
+    def __init__(self, resource, signal="django.db.models.signals.post_save"):
         self.resource = resource
         self.signal = signal
 
@@ -102,5 +112,4 @@ class TastyPieListener(ModelListener):
         bundle = resource.full_dehydrate(bundle)
         # TODO: should we even support this? it seems likely to be request specific
         bundle = resource.alter_detail_data_to_serialize(req, bundle)
-        message = resource.serialize(req, bundle, 'application/json')
-        return self.process_message(message, sender, instance, **kwargs)
+        return resource.serialize(req, bundle, 'application/json')
