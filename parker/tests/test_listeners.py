@@ -4,6 +4,10 @@ from mock import patch, Mock
 
 
 class TestModelListener(object):
+
+    def test_is_base(self):
+        assert issubclass(ModelListener, BaseListener)
+
     def test_setup(self):
         model = Mock()
         signal = Mock()
