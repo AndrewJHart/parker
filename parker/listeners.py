@@ -1,10 +1,10 @@
-""" the events are used to connect """
+""" the listeners are used to connect a carriers publish with appropriate message generation """
 from django.http import HttpRequest
 from parker.util import smartimport, LazyDescriptor
 
 
 class BaseListener(object):
-    """ for now this just exists to check if an object is an event. 
+    """ for now this just exists to check if an object is a listener.
        code may be moved up here later
     """
     def setup(self, publish):
