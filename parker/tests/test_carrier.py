@@ -1,6 +1,4 @@
 from parker.carrier import BaseCarrier
-from parker.events import BaseEvent
-
 from unittest2 import TestCase
 
 from mock import patch, Mock, call
@@ -13,28 +11,28 @@ class TestBaseCarrier(TestCase):
         self.TestCarrier = TestCarrier
         self.carrier = TestCarrier()
 
-    def test_collect_events(self):
+    def test_collect_listeners(self):
         mock_conn = Mock()
-        class TestEvent(object):
+        class TestListener(object):
             handler = Mock()
             connect = mock_conn
             def connect(self, publish):
                 pass
 
-        event_instance1 = TestEvent()
-        event_instance2 = TestEvent()
+        listener_instance1 = TestListener()
+        listener_instance2 = TestListener()
 
         class TestCarrier(BaseCarrier):
             def __init__(self):
                 pass
 
-            event1 = event_instance1
-            event2 = event_instance2
+            listener1 = listener_instance1
+            listener2 = listener_instance2
 
-        with patch('parker.carrier.BaseEvent', TestEvent):
+        with patch('parker.carrier.BaseListener', TestListener):
             carrier = TestCarrier()
-            self.assertTrue(event_instance1 in carrier.collect_events())
-            self.assertTrue(event_instance2 in carrier.collect_events())
+            self.assertTrue(listener_instance1 in carrier.collect_listeners())
+            self.assertTrue(listener_instance2 in carrier.collect_listeners())
 
 
     def test_get_publish_queues(self):
@@ -49,14 +47,14 @@ class TestBaseCarrier(TestCase):
         self.assertEqual(pub.call_count, 2)
 
 
-    @patch('parker.carrier.BaseEvent')
-    def test_setup_events(self, BE):
-        event1 = Mock()
-        event2 = Mock()
-        self.carrier.collect_events = lambda : [event1, event2]
-        self.carrier.setup_events()
-        self.assertEqual(event1.connect.call_args, call(self.carrier.publish))
-        self.assertEqual(event2.connect.call_args, call(self.carrier.publish))
+    @patch('parker.carrier.BaseListener')
+    def test_setup_listeners(self, BE):
+        listener1 = Mock()
+        listener2 = Mock()
+        self.carrier.collect_listeners = lambda : [listener1, listener2]
+        self.carrier.setup_listeners()
+        self.assertEqual(listener1.setup.call_args, call(self.carrier.publish))
+        self.assertEqual(listener2.setup.call_args, call(self.carrier.publish))
 
 
 class TestGetWidget(TestCase):

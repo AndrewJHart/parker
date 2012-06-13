@@ -3,7 +3,7 @@ import pystache
 from django.template import Template, Context
 from django.template.defaultfilters import escapejs
 
-from parker.events import BaseEvent
+from parker.listeners import BaseListener
 from parker.loader import ParkerLoader
 from parker.message import publish
 
@@ -46,7 +46,7 @@ class BaseCarrier(object):
     initialize = False
 
     def __init__(self):
-        self.setup_events()
+        self.setup_listeners()
 
     def get_publish_queues(self, *args, **kwargs):
         """ based on the arguments given to a signal what queues should it publish too
@@ -61,17 +61,17 @@ class BaseCarrier(object):
         return self.default_queues
 
     # The following code may not belong here
-    def collect_events(self):
-        """ return all event instances associates with this carrier """
-        return [x[1] for x in getmembers(self, lambda x: isinstance(x, BaseEvent))]
+    def collect_listeners(self):
+        """ return all listener instances associates with this carrier """
+        return [x[1] for x in getmembers(self, lambda x: isinstance(x, BaseListener))]
 
-    def setup_events(self):
+    def setup_listeners(self):
         """ this really seems wrong 
-            Do whatever the events think they need to get connected
+            Do whatever the listeners think they need to get connected
             I'm also not sure how to get the queus if they're not static
         """
-        for event in self.collect_events():
-            event.connect(self.publish)
+        for listener in self.collect_listeners():
+            listener.setup(self.publish)
 
     def publish(self, message, *args, **kwargs):
         for queue in self.get_publish_queues(*args, **kwargs):
