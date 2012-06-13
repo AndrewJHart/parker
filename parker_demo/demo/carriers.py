@@ -1,6 +1,5 @@
 from parker.carrier import BaseCarrier
-from parker.events import SignalEvent
-from parker.handlers import ModelHandler
+from parker.listeners import TastyPieListener
 
 from parker.library import parker_lib
 
@@ -11,6 +10,4 @@ class DemoCarrier(BaseCarrier):
     queues = ['test.queue1']
     socket = 'mordechai.cei.cox.com:8000'
 
-    demo_model_event = SignalEvent( 'django.db.models.signals.post_save',
-                                     ModelHandler(['test_queue1']),
-                                     'parker_demo.demo.models.ParkerDemo')
+    demo_update = TastyPieListener('parker_demo.demo.resources.DemoResource')
