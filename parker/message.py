@@ -3,6 +3,7 @@ from kombu import Connection, Exchange
 
 from django.conf import settings
 
+# TODO multiple exhcanges
 exchange = Exchange('browsermq_global', type='topic')
 
 DEFAULT_BROKER_URL = "amqp://guest:guest@localhost:5672//"
