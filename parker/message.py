@@ -15,7 +15,7 @@ def publish(route, message):
     :param message: a dictionary or list to be send as the message
     """
     # TODO don't hardcode this and attempt to reuse connections
-    url = getattr(settings, "BROKER_URL", DEFAULT_BROKER_URL)
+    url = getattr(settings, "PARKER_BROKER_URL", DEFAULT_BROKER_URL)
     with Connection(url) as conn:
         producer = conn.Producer()
         #TODO I think I need to dump this to keep from pickling and sending a stream

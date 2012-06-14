@@ -43,7 +43,7 @@ class BaseCarrier(object):
     #: the socket path that the widgets should listen on
     @property
     def socket(self):
-        return getattr(settings, 'DEFAULT_SOCKET', DEFAULT_SOCKET)
+        return getattr(settings, 'PARKER_DEFAULT_SOCKET', DEFAULT_SOCKET)
 
     #: the default prototype for this widget
     default_prototype = 'browsermq'
