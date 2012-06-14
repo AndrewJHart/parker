@@ -5,8 +5,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^page1/$', direct_to_template, {'template': 'page1.html',
-        'extra_context':{'mtemplate':'<h3>{{title}}</h3><p>{{summary}}<br/><a href="{{url}}">{{url}}</a></p>'}}),
+    url(r'^page1/$', direct_to_template, {'template': 'page1.html',}),
+    url(r'^load/$', direct_to_template, {'template': 'load.html',}),
     # Examples:
     # url(r'^$', 'parker_demo.views.home', name='home'),
     # url(r'^parker_demo/', include('parker_demo.foo.urls')),
