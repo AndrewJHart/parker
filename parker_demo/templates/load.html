@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Loadtesting browsermq with parker</h1>
+{% load parker_tags %}
+{% parker "LoadCarrier" "parkertest2" %}
+{% endblock %}
