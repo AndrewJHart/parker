@@ -1,10 +1,11 @@
 """ this is a temporary place to hold the code needed to send messaged """
 from kombu import Connection, Exchange
 
+from django.conf import settings
 
-#TODO don't hard code these
-QUEUE_URL = "amqp://guest:guest@localhost:5672//"
 exchange = Exchange('browsermq_global', type='topic')
+
+DEFAULT_BROKER_URL = "amqp://guest:guest@localhost:5672//"
 
 def publish(route, message):
     """ simply send a messate to a route.
@@ -13,7 +14,8 @@ def publish(route, message):
     :param message: a dictionary or list to be send as the message
     """
     # TODO don't hardcode this and attempt to reuse connections
-    with Connection("amqp://guest:guest@localhost:5672//") as conn:
+    url = getattr(settings, "BROKER_URL", DEFAULT_BROKER_URL)
+    with Connection(url) as conn:
         producer = conn.Producer()
         #TODO I think I need to dump this to keep from pickling and sending a stream
         producer.publish(message,

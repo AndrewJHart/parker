@@ -1,11 +1,15 @@
 from inspect import getmembers
 import pystache
+from django.conf import settings
 from django.template import Template, Context
 from django.template.defaultfilters import escapejs
 
 from parker.listeners import BaseListener
 from parker.loader import ParkerLoader
 from parker.message import publish
+
+
+DEFAULT_SOCKET = ''
 
 #TODO: move this to a template
 #TODO: making this a django template may have been a poor decision
@@ -37,7 +41,9 @@ class BaseCarrier(object):
     default_queues = ['#']
 
     #: the socket path that the widgets should listen on
-    socket = None
+    @property
+    def socket(self):
+        return getattr(settings, 'DEFAULT_SOCKET', DEFAULT_SOCKET)
 
     #: the default prototype for this widget
     default_prototype = 'browsermq'
@@ -76,8 +82,6 @@ class BaseCarrier(object):
     def publish(self, message, *args, **kwargs):
         for queue in self.get_publish_queues(*args, **kwargs):
             publish(message, queue)
-
-
 
     def get_template(self, template=None):
         """ just enough to work on the template tag """
