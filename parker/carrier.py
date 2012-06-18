@@ -1,3 +1,31 @@
+""" parker.carrier
+======================
+
+The carrier contains all of the information for one realtime widget. 
+- It defines when information will be sent(listeners).
+- What information will be sent(listenters).
+- Where it will be sent to(get_publish_queues).
+- What widget this will use(default_template).
+- What that widget will listen too(get_subscribe_queues).
+
+Listeners
+___________
+Instances of `parker.BaseListener` which are attributes of a carrier will be conncected. This is the primary method for publishing.
+
+BaseCarrier
+_____________
+.. autoclass:: parker.carrier.BaseCarrier
+    :members:
+
+
+Examples
+________
+Here is a simple example carrier
+
+.. literalinclude:: ../../parker_demo/demo/carriers.py
+
+"""
+
 from inspect import getmembers
 import pystache
 from django.conf import settings
@@ -28,19 +56,16 @@ marimo.add_widget({
 
 class BaseCarrier(object):
 
-    #: the default template for this carrier's widgets
+    #: the default mustache template for this carrier's widgets
     default_template = None
-
-    #: for now each carrier will publish to it's own exchange
-    exchange = None
 
     #: the default exchange type is topic exchange
     exchange_type = 'topic'
 
-    #: this only works for topic exchanges. otherwise consider changing it
+    #: queues defaults to all which is specific to topic exchanges.
     default_queues = ['#']
 
-    #: the socket path that the widgets should listen on
+    #: where the widget will connect connect to browsermq
     @property
     def socket(self):
         return getattr(settings, 'PARKER_DEFAULT_SOCKET', DEFAULT_SOCKET)
@@ -89,7 +114,8 @@ class BaseCarrier(object):
         return ParkerLoader().load_template_source(template or self.default_template)[0]
 
     def get_widget(self, widget_id, prototype=None, template=None, queues=None, initialize=None, **kwargs):
-        """ once the templatetag finds this carrier this is all it should have call """
+        """ once the templatetag finds this carrier this is all it should have call
+        """
         mustache_template = self.get_template(template)
         context = dict(widget_id=widget_id,
                        prototype=prototype or self.default_prototype,

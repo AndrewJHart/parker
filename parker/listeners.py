@@ -1,13 +1,24 @@
-""" the listeners are used to connect a carriers publish with appropriate message generation """
+""" parker.listeners
+=======================
+
+Listeners connect to an event with their `setup` method and create a message via `get_message`.
+
+
+"""
+
+
 from django.http import HttpRequest
 from parker.util import smartimport, LazyDescriptor
 
 
 class BaseListener(object):
-    """ for now this just exists to check if an object is a listener.
-       code may be moved up here later
+    """ All listeners much descend from this so they can be discovered by their carriers.
+    They
     """
     def setup(self, publish):
+        """ when a carrier is setting itself up it will call this.
+        :param publish: The publish method of the carrier. This should take a message argument as well as *args and **kwargs to determine routing.
+        """
         pass
 
 
@@ -37,7 +48,7 @@ class ModelListener(BaseListener):
         raise NotImplemented
 
     def setup(self, publish):
-        """ passing the publish message down seems backwards but maybe it isn't """
+        """ ModelListener uses django signals of the model and connects publish to those """
         def handler(*args, **kwargs):
             message = self.get_message(*args, **kwargs)
             return publish(message, *args, **kwargs)
@@ -45,18 +56,27 @@ class ModelListener(BaseListener):
         self.signal.connect(handler, sender=self.model)
 
 class TastyPieListener(ModelListener):
+    """ Sets up a model listener using a tastypie resource to determin model and generate the message. """
+
+    #: The resource that this listener will use.
     resource = LazyDescriptor("resource")
 
     @property
     def model(self):
+        """ Get the model from the resource. """
         return self.resource._meta.queryset.model
 
     def __init__(self, resource, signal="django.db.models.signals.post_save"):
+        """
+            :param resource: A resource object or path to one that this listener should use.
+            :param signal: The django signal of the model that this Listener is useing. defaults to `post_save`.
+        """
         self.resource = resource
         self.signal = signal
 
 
     def process_message(self, message, sender, instance, **kwargs):
+        """ TODO: this should either be used or deleted """
         return message
 
     def get_message(self, sender, instance, **kwargs):
