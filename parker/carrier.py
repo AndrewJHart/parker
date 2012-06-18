@@ -81,7 +81,7 @@ class BaseCarrier(object):
 
     def publish(self, message, *args, **kwargs):
         for queue in self.get_publish_queues(*args, **kwargs):
-            publish(message, queue)
+            publish(queue, message)
 
     def get_template(self, template=None):
         """ just enough to work on the template tag """
