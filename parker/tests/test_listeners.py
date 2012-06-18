@@ -22,3 +22,14 @@ class TestModelListener(object):
         handler()
         assert publish.called
         assert get_message.called
+
+    def test_get_message(self):
+        model = Mock()
+        model.a = 1
+        model.b = 2
+        model.c = 3
+        ml = ModelListener(model, fields=['a','b'])
+        mess = ml.get_message(model)
+        assert mess['a'] == 1
+        assert mess['b'] == 2
+        assert not 'c' in mess

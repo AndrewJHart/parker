@@ -13,7 +13,9 @@ from parker.util import smartimport, LazyDescriptor
 
 class BaseListener(object):
     """ All listeners much descend from this so they can be discovered by their carriers.
-    They
+    The only thing a listener must define is a setup method which takes a publish function as it's only argument.
+    The publish function expects to be called with a message and *args, **kwargs to determine what queues to send the message too
+
     """
     def setup(self, publish):
         """ when a carrier is setting itself up it will call this.
@@ -31,21 +33,20 @@ class ModelListener(BaseListener):
     model = LazyDescriptor('model')
 
 
-    def __init__(self, model, signal='django.db.models.signals.post_save', get_message=None):
+    def __init__(self, model, signal='django.db.models.signals.post_save', fields=None):
         """
             :param model: the model or a string that this should listen to
             :param signal: the signal or a string to be imported later that this should connect to
-            :get_message: TODO: fix this
+            :fields: The fields to include in the message.
 
         """
         self.signal = signal
         self.model = model
-        if get_message:
-            self.get_message = get_message
+        self.fields = fields or []
 
-    def get_message(self, *args, **kwargs):
-        """ this can be overriden or passed into __init__ for now """
-        raise NotImplemented
+    def get_message(self, instance, *args, **kwargs):
+        """ returns a dict of the field lists for a  """
+        return dict([(field, getattr(instance, field)) for field in self.fields])
 
     def setup(self, publish):
         """ ModelListener uses django signals of the model and connects publish to those """
