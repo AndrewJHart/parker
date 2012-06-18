@@ -1,4 +1,4 @@
-from parker.carrier import BaseCarrier
+from parker.carrier import BaseCarrier, CachingCarrier
 from unittest2 import TestCase
 
 from mock import patch, Mock, call
@@ -56,6 +56,14 @@ class TestBaseCarrier(TestCase):
         self.assertEqual(listener1.setup.call_args, call(self.carrier.publish))
         self.assertEqual(listener2.setup.call_args, call(self.carrier.publish))
 
+    def test_get_context_default(self):
+        self.assertEqual(BaseCarrier().get_context(), {})
+
+    def test_get_context(self):
+        bc = BaseCarrier()
+        ctx = dict(a=1, b=2)
+        bc.default_context = ctx
+        self.assertEqual(bc.get_context(), bc.default_context)
 
 class TestGetWidget(TestCase):
 
@@ -103,3 +111,29 @@ class TestGetWidget(TestCase):
             carrier.get_widget('test_id', initialize=True)
             render_dict = mock_template.render.call_args[0][0]
             self.assertEqual(render_dict['initial_state'], 'test1')
+
+
+class TestCachingCarrier(TestCase):
+    def setUp(self):
+        self.carrier = CachingCarrier()
+        self.carrier.default_queues = ['queue1', 'queue2']
+
+    @patch('parker.carrier.cache')
+    @patch('parker.carrier.time')
+    @patch('parker.carrier.publish')
+    def test_publish(self, publish, time, cache):
+        time.time.return_value = 100
+        self.carrier.publish('message')
+        cache.set.assert_called_any('queue1', (100, 'message'))
+        cache.set.assert_called_any('queue2', (100, 'message'))
+        self.assertEqual(cache.set.call_count, 2)
+
+    @patch('parker.carrier.cache')
+    def test_get_context(self, cache):
+        cdict = {}
+        for q, t in zip(self.carrier.default_queues, range(2)):
+            cdict[self.carrier.cache_key % q] = (t, q)
+        cache.get = lambda x: cdict[x]
+
+        context = self.carrier.get_context(self.carrier.default_queues)
+        self.assertEqual(context, 'queue2')

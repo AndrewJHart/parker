@@ -25,10 +25,11 @@ Here is a simple example carrier
 .. literalinclude:: ../../parker_demo/demo/carriers.py
 
 """
-
+import time
 from inspect import getmembers
 import pystache
 from django.conf import settings
+from django.core.cache import cache
 from django.template import Template, Context
 from django.template.defaultfilters import escapejs
 
@@ -75,6 +76,9 @@ class BaseCarrier(object):
 
     #: does this widget initialize by default
     initialize = False
+
+    #: the default context to initialize with
+    default_context = {}
 
     def __init__(self):
         self.setup_listeners()
@@ -132,6 +136,31 @@ class BaseCarrier(object):
         template = Template(WIDGET_CODE)
         return template.render(Context(context))
 
+    def get_context(self, *args, **kwargs):
+        """ return the default context. """
+        return getattr(self, 'default_context')
+
+
+class CachingCarrier(BaseCarrier):
+    """ this carrier is set up for simple caching.
+        on publish is saves the message for each queue it's listening to with a timestamp
+        on widget creation it get's the cache for each queue and populates the widget with the newest one.
+    """
+    #: the cache to use after the queue name is subsituted in. This value will allow multiple carriers that publish to the same queue to overwrite each other.
+    cache_key = 'parker:caching_carrier:%s'
+
+    def publish(self, message, *args, **kwargs):
+        for queue in self.get_publish_queues(*args, **kwargs):
+            publish(queue, message)
+
+            cache.set(self.cache_key % queue, (time.time(), message))
+
     def get_context(self, queues, **kwargs):
         """if you want to prepopulate a widget this should generate the context"""
-        pass
+        message = None
+        for queue in queues:
+            nmessage = cache.get(self.cache_key % queue)
+            if message is None or nmessage[0] > message[0]:
+                message = nmessage
+
+        return message[1]
