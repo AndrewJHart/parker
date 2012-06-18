@@ -11,17 +11,17 @@ class TestModelListener(object):
     def test_setup(self):
         model = Mock()
         signal = Mock()
-        get_message= Mock()
-        ml = ModelListener(model, signal, get_message)
+        ml = ModelListener(model, signal,)
+        ml.get_message = Mock()
         publish = Mock()
         ml.setup(publish)
         assert not publish.called
-        assert not get_message.called
+        assert not ml.get_message.called
         assert signal.connect.called
         handler = signal.connect.call_args[0][0]
         handler()
         assert publish.called
-        assert get_message.called
+        assert ml.get_message.called
 
     def test_get_message(self):
         model = Mock()
