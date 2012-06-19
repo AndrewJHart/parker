@@ -11,7 +11,7 @@ class TestModelListener(object):
     def test_setup(self):
         model = Mock()
         signal = Mock()
-        ml = ModelListener(model, signal,)
+        ml = ModelListener(model, signal)
         ml.get_message = Mock()
         publish = Mock()
         ml.setup(publish)

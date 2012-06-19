@@ -101,24 +101,37 @@ class BaseCarrier(object):
         return [x[1] for x in getmembers(self, lambda x: isinstance(x, BaseListener))]
 
     def setup_listeners(self):
-        """ this really seems wrong 
-            Do whatever the listeners think they need to get connected
-            I'm also not sure how to get the queus if they're not static
+        """ Do whatever the listeners think they need to get connected
         """
         for listener in self.collect_listeners():
             listener.setup(self.publish)
 
     def publish(self, message, *args, **kwargs):
+        """ publish a message to queues.
+
+            publishes the message to `get_publish_queues(*args, **kwargs)`.
+
+            :arg message: the message to publish.
+        """
         for queue in self.get_publish_queues(*args, **kwargs):
             publish(queue, message)
 
     def get_template(self, template=None):
-        """ just enough to work on the template tag """
+        """ load a mustache template.
+
+            :keyword template: The template path to load. default=`self.default_template`.
+        """
         #TODO what should we do about multiline templates here
         return ParkerLoader().load_template_source(template or self.default_template)[0]
 
     def get_widget(self, widget_id, prototype=None, template=None, queues=None, initialize=None, **kwargs):
         """ once the templatetag finds this carrier this is all it should have call
+
+            :arg widget_id: the id the widget will get in the page
+            :keyword prototype: the widget prototype to use. default = `self.default_prototype`
+            :keyword template: The mustache template to pass to the widget. default = `self.default_template`
+            :keyword queues: The queues to publish to. default = `get_subscribe_queues(**kwargs)`
+
         """
         mustache_template = self.get_template(template)
         context = dict(widget_id=widget_id,
@@ -150,6 +163,7 @@ class CachingCarrier(BaseCarrier):
     cache_key = 'parker:caching_carrier:%s'
 
     def publish(self, message, *args, **kwargs):
+        """ publishes to the message queue and also to cache for each queue """
         for queue in self.get_publish_queues(*args, **kwargs):
             publish(queue, message)
 
