@@ -3,44 +3,69 @@
 
 Listeners connect to an event with their `setup` method and create a message via `get_message`.
 
+ModelListener
+________________
+
+.. autoclass:: ModelListener
+    :members:
+
+
+TastyPieListener
+_________________
+
+.. autoclass:: TastyPieListener
+    :members:
+
+
+Writing your own listener
+____________________________
+To write your own listener extent `BaseListener` and define a setup method.
+
+.. autoclass::  BaseListener
+    :members:
 
 """
 
 
 from django.http import HttpRequest
-from parker.util import smartimport, LazyDescriptor
+from parker.util import LazyDescriptor
 
 
 class BaseListener(object):
     """ All listeners much descend from this so they can be discovered by their carriers.
     The only thing a listener must define is a setup method which takes a publish function as it's only argument.
-    The publish function expects to be called with a message and *args, **kwargs to determine what queues to send the message too
+    The publish function expects to be called with a message, and arguments to determine what queues to send the message too
 
     """
     def setup(self, publish):
         """ when a carrier is setting itself up it will call this.
-        :param publish: The publish method of the carrier. This should take a message argument as well as *args and **kwargs to determine routing.
+
+        :param publish: The publish method of the carrier. It should take a message argument and arguments to determine routing.
         """
         pass
 
 
 class ModelListener(BaseListener):
-    """ this  is a listener for model signals it defaults to post_save
-        it either needs to have get_message overrriden or one can be passed in when it's created
+    """
+    The model listener connects to model signals.
+    If your message is simple and includes only json serializable attributes on the model instance you can pass these in in the fields arg.
+
+    If you need more complex messages or model attributes that aren't json serializable you will have to override the get_message method.
     """
 
-    signal = LazyDescriptor('signal')
+    signal = LazyDescriptor('signal', 'django.db.models.signals.post_save')
     model = LazyDescriptor('model')
 
 
-    def __init__(self, model, signal='django.db.models.signals.post_save', fields=None):
+    def __init__(self, model, signal=None, fields=None):
         """
             :param model: the model or a string that this should listen to
-            :param signal: the signal or a string to be imported later that this should connect to
-            :fields: The fields to include in the message.
+            :keyword signal: the signal or a string to be imported later that this should connect to. default=post_save
+            :keyword fields: The fields to include in the message. default=None
 
         """
-        self.signal = signal
+        if signal is not None:
+            self.signal = signal
         self.model = model
         self.fields = fields or []
 
@@ -84,8 +109,6 @@ class TastyPieListener(ModelListener):
         """ unfortunately the design of tastypie makes it hard to use it to just serialize objects
             if you do much with the request in your resource this will break
         """
-        if isinstance(self.resource, basestring):
-            self.resource = smartimport(self.resource)
         resource = self.resource()
         # is this the least disruptive way to to this?
         def get_obj(**kwargs):
