@@ -24,16 +24,18 @@ class TestSmartImport(TestCase):
 
 
 class TestLazyDescriptor(TestCase):
-    def test_attr_error(self):
+
+    def test_None_default(self):
         class Test(object):
             attr = LazyDescriptor("attr")
-        with self.assertRaises(AttributeError):
-           Test().attr
+        self.assertTrue(Test.attr is None)
+        self.assertTrue(Test().attr is None)
 
     def test_default(self):
         class Test(object):
             attr = LazyDescriptor("attr", 10)
         self.assertEqual(Test().attr, 10)
+        self.assertEqual(Test.attr, 10)
 
     def test_set(self):
         class Test(object):
@@ -41,6 +43,8 @@ class TestLazyDescriptor(TestCase):
         t = Test()
         t.attr = 14
         self.assertEqual(t.attr, 14)
+        Test.attr = 10
+        self.assertEqual(Test.attr, 10)
 
     @patch("parker.util.smartimport")
     def test_imports(self, mocksi):

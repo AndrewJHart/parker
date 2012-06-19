@@ -35,6 +35,14 @@ class LazyDescriptor(object):
         self.name = "_" + name
 
     def __get__(self, obj, cls):
+        # if obj is none this is class not an instance.
+        # import and stick in self.val
+        if obj is None:
+            if isinstance(self.val, basestring):
+                self.val = smartimport(self.val)
+            return self.val
+
+        # this is the first time we've gotten on this object move for self.val to object.name
         if not hasattr(obj, self.name):
               setattr(obj, self.name, self.val)
 
@@ -45,4 +53,7 @@ class LazyDescriptor(object):
 
 
     def __set__(self, obj, val):
-        setattr(obj, self.name, val)
+        if obj is None:
+            self.val = val
+        else:
+            setattr(obj, self.name, val)
