@@ -24,6 +24,9 @@ def load_carrier(carrier_name):
 class LazyDescriptor(object):
     """ this uses smartimport to turn a string into what it's supposed to be when it's accessed """
 
+    #: val is what this attribute will get before it's set. It's `None` so that things which iterate over all attributes won't break on the class itself
+    val = None
+
     def __init__(self, name, *args):
         """ this requires a name where it will eventually store the data and optionally an initial value
         """
@@ -33,10 +36,7 @@ class LazyDescriptor(object):
 
     def __get__(self, obj, cls):
         if not hasattr(obj, self.name):
-            if hasattr(self, 'val'):
               setattr(obj, self.name, self.val)
-            else:
-                raise AttributeError
 
         if isinstance(getattr(obj, self.name), basestring):
             setattr(obj, self.name, smartimport(getattr(obj, self.name)))
