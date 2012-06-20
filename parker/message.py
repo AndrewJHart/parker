@@ -14,11 +14,10 @@ def publish(route, message):
     :param route: a route in the browsermq format right now just a routing_key
     :param message: a dictionary or list to be send as the message
     """
-    # TODO don't hardcode this and attempt to reuse connections
+    # TODO attempt to reuse connections
     url = getattr(settings, "PARKER_BROKER_URL", DEFAULT_BROKER_URL)
     with Connection(url) as conn:
         producer = conn.Producer()
-        #TODO I think I need to dump this to keep from pickling and sending a stream
         producer.publish(message,
             exchange = exchange,
             routing_key = route,
