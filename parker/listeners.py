@@ -82,14 +82,17 @@ class ModelListener(BaseListener):
         self.signal.connect(handler, sender=self.model)
 
 class TastyPieListener(ModelListener):
-    """ Sets up a model listener using a tastypie resource to determin model and generate the message. """
+    """ Sets up a model listener using a tastypie resource to determin model and generate the message.
+    Since django-tastypie already contains a lot of logic for turning model instances into json it is a good option for a Listener.
+
+    """
 
     #: The resource that this listener will use.
     resource = LazyDescriptor("resource")
 
     @property
     def model(self):
-        """ Get the model from the resource. """
+        """ Model is a property so it will be determined from the resource """
         return self.resource._meta.queryset.model
 
     def __init__(self, resource, signal="django.db.models.signals.post_save"):
