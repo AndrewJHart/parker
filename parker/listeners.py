@@ -103,11 +103,6 @@ class TastyPieListener(ModelListener):
         self.resource = resource
         self.signal = signal
 
-
-    def process_message(self, message, sender, instance, **kwargs):
-        """ TODO: this should either be used or deleted """
-        return message
-
     def get_message(self, sender, instance, **kwargs):
         """ unfortunately the design of tastypie makes it hard to use it to just serialize objects
             if you do much with the request in your resource this will break
