@@ -14,9 +14,13 @@ Instances of `parker.BaseListener` which are attributes of a carrier will be con
 
 BaseCarrier
 _____________
-.. autoclass:: parker.carrier.BaseCarrier
+.. autoclass:: parker.carriers.BaseCarrier
     :members:
 
+CachingCarrier
+________________
+.. autoclass:: parker.carriers.CachingCarrier
+    :members:
 
 Examples
 ________
@@ -167,7 +171,10 @@ class CachingCarrier(BaseCarrier):
     cache_key = 'parker:caching_carrier:%s'
 
     def publish(self, message, *args, **kwargs):
-        """ publishes to the message queue and also to cache for each queue """
+        """ publishes to the message queue and also to cache for each queue
+            It is expected that this will be connected with get message by a listeners setup method.
+            If the message passed to it is None it will publish nothing.
+        """
         if message is None:
             return
         for queue in self.get_publish_queues(*args, **kwargs):
