@@ -1,5 +1,5 @@
 Carriers
 ============
 
-.. automodule:: parker.carrier
+.. automodule:: parker.carriers
     :members:

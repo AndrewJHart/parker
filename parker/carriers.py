@@ -1,4 +1,4 @@
-""" parker.carrier
+""" parker.carriers
 ======================
 
 The carrier contains all of the information for one realtime widget. 

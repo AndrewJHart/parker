@@ -1,4 +1,4 @@
-from parker.carrier import BaseCarrier, CachingCarrier
+from parker.carriers import BaseCarrier, CachingCarrier
 from unittest2 import TestCase
 
 from mock import patch, Mock, call

@@ -1,4 +1,4 @@
-from parker.carrier import BaseCarrier
+from parker.carriers import BaseCarrier
 from parker.listeners import TastyPieListener
 
 from parker.library import parker_lib
