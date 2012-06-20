@@ -113,6 +113,10 @@ class BaseCarrier(object):
 
             :arg message: the message to publish.
         """
+        # a message of None will not be sent. and empty dict should be used instead
+        if message is None:
+            return
+
         for queue in self.get_publish_queues(*args, **kwargs):
             publish(queue, message)
 
@@ -164,6 +168,8 @@ class CachingCarrier(BaseCarrier):
 
     def publish(self, message, *args, **kwargs):
         """ publishes to the message queue and also to cache for each queue """
+        if message is None:
+            return
         for queue in self.get_publish_queues(*args, **kwargs):
             publish(queue, message)
 

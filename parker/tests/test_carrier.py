@@ -46,6 +46,10 @@ class TestBaseCarrier(TestCase):
         self.carrier.publish("message", "q")
         self.assertEqual(pub.call_count, 2)
 
+    @patch('parker.carriers.publish')
+    def test_publish_none(self, pub):
+        self.carrier.publish(None)
+        self.assertFalse(pub.called)
 
     @patch('parker.carriers.BaseListener')
     def test_setup_listeners(self, BE):
@@ -127,6 +131,13 @@ class TestCachingCarrier(TestCase):
         cache.set.assert_called_any('queue1', (100, 'message'))
         cache.set.assert_called_any('queue2', (100, 'message'))
         self.assertEqual(cache.set.call_count, 2)
+
+    @patch('parker.carriers.cache')
+    @patch('parker.carriers.publish')
+    def test_publish_none(self, pub, cache):
+        self.carrier.publish(None)
+        self.assertFalse(pub.called)
+        self.assertFalse(cache.set.called)
 
     @patch('parker.carriers.cache')
     def test_get_context(self, cache):
