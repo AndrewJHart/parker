@@ -22,6 +22,7 @@ Where the widgets should connect to browsermq.
 
 PARKER_BROKER_URL
 ____________________
+default = "amqp://guest:guest@localhost:5672//"
 Where parker should publish too. Needs some work.
-
+Of the form {protocol}://{user}:{password}@{domain}:{port} to work with kombu.
 
