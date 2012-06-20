@@ -29,7 +29,7 @@ class TestBaseCarrier(TestCase):
             listener1 = listener_instance1
             listener2 = listener_instance2
 
-        with patch('parker.carrier.BaseListener', TestListener):
+        with patch('parker.carriers.BaseListener', TestListener):
             carrier = TestCarrier()
             self.assertTrue(listener_instance1 in carrier.collect_listeners())
             self.assertTrue(listener_instance2 in carrier.collect_listeners())
@@ -41,13 +41,13 @@ class TestBaseCarrier(TestCase):
     def test_get_subscribe_queues(self):
         self.assertEqual(self.carrier.get_subscribe_queues(), ['queue1','queue2'])
 
-    @patch('parker.carrier.publish')
+    @patch('parker.carriers.publish')
     def test_publish(self, pub):
         self.carrier.publish("message", "q")
         self.assertEqual(pub.call_count, 2)
 
 
-    @patch('parker.carrier.BaseListener')
+    @patch('parker.carriers.BaseListener')
     def test_setup_listeners(self, BE):
         listener1 = Mock()
         listener2 = Mock()
@@ -80,7 +80,7 @@ class TestGetWidget(TestCase):
 
     def test_defaults(self):
         carrier = self.TestCarrier()
-        with patch('parker.carrier.Template') as MTemplate:
+        with patch('parker.carriers.Template') as MTemplate:
             mock_template = Mock()
             MTemplate.return_value = mock_template
             carrier.get_widget('test_id')
@@ -93,7 +93,7 @@ class TestGetWidget(TestCase):
 
     def test_nondefaults(self):
         carrier = self.TestCarrier()
-        with patch('parker.carrier.Template') as MTemplate:
+        with patch('parker.carriers.Template') as MTemplate:
             mock_template = Mock()
             MTemplate.return_value = mock_template
             carrier.get_widget('test_id', 'tproto', queues=['tqueue'])
@@ -105,7 +105,7 @@ class TestGetWidget(TestCase):
 
     def test_initialize(self):
         carrier = self.TestCarrier()
-        with patch('parker.carrier.Template') as MTemplate:
+        with patch('parker.carriers.Template') as MTemplate:
             mock_template = Mock()
             MTemplate.return_value = mock_template
             carrier.get_widget('test_id', initialize=True)
@@ -118,9 +118,9 @@ class TestCachingCarrier(TestCase):
         self.carrier = CachingCarrier()
         self.carrier.default_queues = ['queue1', 'queue2']
 
-    @patch('parker.carrier.cache')
-    @patch('parker.carrier.time')
-    @patch('parker.carrier.publish')
+    @patch('parker.carriers.cache')
+    @patch('parker.carriers.time')
+    @patch('parker.carriers.publish')
     def test_publish(self, publish, time, cache):
         time.time.return_value = 100
         self.carrier.publish('message')
@@ -128,7 +128,7 @@ class TestCachingCarrier(TestCase):
         cache.set.assert_called_any('queue2', (100, 'message'))
         self.assertEqual(cache.set.call_count, 2)
 
-    @patch('parker.carrier.cache')
+    @patch('parker.carriers.cache')
     def test_get_context(self, cache):
         cdict = {}
         for q, t in zip(self.carrier.default_queues, range(2)):
